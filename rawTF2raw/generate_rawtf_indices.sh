@@ -56,13 +56,6 @@ timeslices_sorted=timeslices_$(echo ${rawtfFileList} | sed 's/.txt//g' | awk -F 
 ## print prcoessing time info
 export DPL_REPORT_PROCESSING=1
 
-# commands
-if [ "0$nBlocks" -eq "00" ]; then
-  GREP_CMD="grep 'tf-reader.*Done processing'"
-else
-  GREP_CMD="grep "Block:${nBlocks}" -A 6 | grep 'tf-reader.*Done processing'"
-fi
-
 # sourced functions
 check_tfs_per_file() {
   nFiles=10
@@ -71,7 +64,11 @@ check_tfs_per_file() {
 }
 
 sort_tfs() {
-  time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | $GREP_CMD | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
+  if [ "0$nBlocks" -eq "00" ]; then
+    time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep 'tf-reader.*Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
+  else
+    time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep "Block:${nBlocks}" -A 6 | grep 'tf-reader.*Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
+  fi
   firstLine=$(grep -nr tfCounter:${firstTF} ${tfs_sorted} | awk -F ':' '{print $1}')
   tail -n +${firstLine} ${tfs_sorted} | head -n ${nTFs} | awk '{print $1}' | sort -V | sed -z -e 's/timeslice://g ;  s/\n/,/g ; s/,$//g' >${timeslices_sorted}
 }
