@@ -75,6 +75,7 @@ sort_tfs() {
 
 # creation of raw data
 if [ "0${runMode}" -eq "01" ]; then
+  mkdir -p ${outputDir}
   echo "LID=$(cat ${timeslices_sorted})" | tee ${outputDir}.log
   LID=$(cat ${timeslices_sorted})
   echo "o2-raw-tf-reader-workflow --raw-only-det all  --shm-segment-size 16000000000  --input-data ${rawtfFileList} --select-tf-ids " '$LID' " | o2-raw-data-dump-workflow --tof-input-uncompressed  --shm-segment-size 16000000000 --fatal-on-deadbeef --output-directory  ${outputDir} --dump-verbosity 1 --run | tee -a ${outputDir}.log" | tee -a ${outputDir}.log
