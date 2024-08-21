@@ -4,7 +4,7 @@
 # source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh
 
 print_help() {
-  cat << EOF 
+  cat <<EOF
   Script to extract consecutive timeframes from a list of rawtf files and create the corresponding raw data
 
   Functions sourced by sourcing script without parameters:
@@ -12,11 +12,10 @@ print_help() {
       - print the average number of TFs from a small subset of rawtf files from the input file list
     - sort_tfs
       - sort the TFs from the input file list in continuous order and save the corresponding timeslice ids in the order they appear in the input file list
+      - if nBlocks (parameter 6) is not 0, then there is an additional check on the number of requested inputs defined by nBlocks
       - output:
         - sorted list with TF timing info
         - file with timeslice indices to be used for raw data creation
-    - sort_tfs_check_input
-      - same as sort_tfs, but in addition make sure that number of inputs matches the desired number of inputs given by parameter 6
 
   Parameters:
     - param1: run mode
@@ -27,8 +26,7 @@ print_help() {
     - param4: number of TFs to process
     - param5: counter index of first TF to process 
     - param6: number of Blocks to be expected per TF to select data for all included detectors
-          - used in sort_tfs_check_input
-          - if number of inputs is irrelevant, can be set to arbitrary value and sort_tfs can be used instead
+          - if number of inputs is irrelevant, it can be set to 0 to be ignored
 EOF
 
   return
@@ -58,6 +56,13 @@ timeslices_sorted=timeslices_$(echo ${rawtfFileList} | sed 's/.txt//g' | awk -F 
 ## print prcoessing time info
 export DPL_REPORT_PROCESSING=1
 
+# commands
+if [ "0$nBlocks" -eq "00" ]; then
+  GREP_CMD="grep 'tf-reader.*Done processing'"
+else
+  GREP_CMD="grep "Block:${nBlocks}" -A 6 | grep 'tf-reader.*Done processing'"
+fi
+
 # sourced functions
 check_tfs_per_file() {
   nFiles=10
@@ -66,13 +71,7 @@ check_tfs_per_file() {
 }
 
 sort_tfs() {
-  time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep 'Done processing' | sed 's/,//g' | grep tf-reader | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
-  firstLine=$(grep -nr tfCounter:${firstTF} ${tfs_sorted} | awk -F ':' '{print $1}')
-  tail -n +${firstLine} ${tfs_sorted} | head -n ${nTFs} | awk '{print $1}' | sort -V | sed -z -e 's/timeslice://g ;  s/\n/,/g ; s/,$//g' >${timeslices_sorted}
-}
-
-sort_tfs_check_input() {
-  time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep "Block:${nBlocks}" -A 6 | grep 'tf-reader.*Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
+  time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | $GREP_CMD | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
   firstLine=$(grep -nr tfCounter:${firstTF} ${tfs_sorted} | awk -F ':' '{print $1}')
   tail -n +${firstLine} ${tfs_sorted} | head -n ${nTFs} | awk '{print $1}' | sort -V | sed -z -e 's/timeslice://g ;  s/\n/,/g ; s/,$//g' >${timeslices_sorted}
 }
