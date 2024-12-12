@@ -5,34 +5,49 @@
 # epn | task name | state (from) | state (to) | time for transition = timestamp(state) - timestamp(previous state)
 
 # some development stuff
-# cd ~/env_creation_profiling/dev_grep_logs_2rPGtuzQb8Y
-# grep -nr '\-\-> ' | grep -v 'RUNNING ---> READY' | grep epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log
-# output:
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:39:[11:24:18][STATE] Starting FairMQ state machine --> IDLE
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:40:[11:24:41][STATE] IDLE ---> INITIALIZING DEVICE
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:56:[11:25:02][STATE] INITIALIZING DEVICE ---> INITIALIZED
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:57:[11:25:06][STATE] INITIALIZED ---> BINDING
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:58:[11:25:06][STATE] BINDING ---> BOUND
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:59:[11:25:07][STATE] BOUND ---> CONNECTING
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:60:[11:25:07][STATE] CONNECTING ---> DEVICE READY
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:61:[11:25:07][STATE] DEVICE READY ---> INITIALIZING TASK
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:62:[11:25:17][STATE] INITIALIZING TASK ---> READY
-# epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:63:[11:25:32][STATE] READY ---> RUNNING
+# [09:11:20][STATE] Starting FairMQ state machine --> IDLE
+# [09:11:35][STATE] IDLE ---> INITIALIZING DEVICE
+# [09:11:35][INFO] id00000000046eb4b0:Init            S> Entering Init callback.
+# [09:11:35][INFO] id00000000046eb4b0:Init            E> Exiting Init callback.
+# [09:11:35][STATE] INITIALIZING DEVICE ---> INITIALIZED
+# [09:12:00][STATE] INITIALIZED ---> BINDING
+# [09:12:00][STATE] BINDING ---> BOUND
+# [09:12:00][STATE] BOUND ---> CONNECTING
+# [09:12:00][STATE] CONNECTING ---> DEVICE READY
+# [09:12:00][STATE] DEVICE READY ---> INITIALIZING TASK
+# [09:12:00][INFO] id00000000046eb4b0:InitTask        S> Entering InitTask callback.
+# [09:12:01][INFO] id00000000046eb4b0:InitTask        E> Exiting InitTask callback waiting for the remaining region callbacks.
+# [09:12:01][INFO] id00000000046eb4b0:InitTask        S> Waiting for registation events.
+# [09:12:01][INFO] id00000000046eb4b0:InitTask        *> Memory registration event received.
+# [09:12:01][INFO] id00000000046eb4b0:InitTask        E> Done waiting for registration events.
+# [09:12:01][STATE] INITIALIZING TASK ---> READY
 
 states=(
   "Starting_FairMQ_state_machine"
   "IDLE"
+  "Entering_Init_callback"
+  "Exiting_Init_callback"
   "INITIALIZING_DEVICE"
   "INITIALIZED"
   "DEVICE_READY"
+  "Entering_InitTask_callback"
+  "Exiting_InitTask_callback"
+  "Waiting_for_registation_events"
+  "Done_waiting_for_registration_events"
   "INITIALIZING_TASK"
 )
 states_grep_strings=(
   "Starting FairMQ state machine \-\-> IDLE"
   "IDLE \-\-\-> INITIALIZING DEVICE"
+  "Entering Init callback"
+  "Exiting Init callback"
   "INITIALIZING DEVICE \-\-\-> INITIALIZED"
-  "CONNECTING \-\-\-> DEVICE READY"
+  "INITIALIZED \-\-\-> BINDING"
   "DEVICE READY \-\-\-> INITIALIZING TASK"
+  "Entering InitTask callback"
+  "Exiting InitTask callback"
+  "Waiting for registation events"
+  "Done waiting for registration events"
   "INITIALIZING TASK \-\-\-> READY"
 )
 
@@ -56,8 +71,8 @@ for dir in $wDir/epn*; do
       state_to=${states[$i]}
 
       # get timestamps in seconds
-      timestamp_from=$(date --date="$(grep "${states_grep_strings[$((i - 1))]}" $file | awk '{print $1}' | sed -e 's/\]\[STATE\]//g' -e 's/\[//g')" +%s)
-      timestamp_to=$(date --date="$(grep "${states_grep_strings[$i]}" $file | awk '{print $1}' | sed -e 's/\]\[STATE\]//g' -e 's/\[//g')" +%s)
+      timestamp_from=$(date --date="$(grep "${states_grep_strings[$((i - 1))]}" $file | awk '{print $1}' | sed -e 's/\]\[STATE\]//g' -e 's/\]\[INFO\]//g' -e 's/\[//g')" +%s)
+      timestamp_to=$(date --date="$(grep "${states_grep_strings[$i]}" $file | awk '{print $1}' | sed -e 's/\]\[STATE\]//g' -e 's/\]\[INFO\]//g' -e 's/\[//g')" +%s)
 
       # calculate transition times
       delta=$((timestamp_to - timestamp_from))
