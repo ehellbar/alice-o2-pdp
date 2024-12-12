@@ -20,7 +20,7 @@
 # epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:63:[11:25:32][STATE] READY ---> RUNNING
 
 states=(
-  "Starting FairMQ state machine"
+  "Starting_FairMQ_state_machine"
   "IDLE"
   "INITIALIZING_DEVICE"
   "INITIALIZED"
