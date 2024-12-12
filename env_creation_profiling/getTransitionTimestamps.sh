@@ -74,3 +74,6 @@ for i in $(seq 1 $((${#states[@]} - 2))); do
   done
 
 done
+
+outFileSorted=$(echo $outFile | sed 's/.txt/_sorted.txt/g')
+sort --key=5 ${outFile} >${outFileSorted}
