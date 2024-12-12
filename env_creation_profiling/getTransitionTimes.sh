@@ -20,13 +20,12 @@
 # epn315/gpu-reconstruction_t0_reco1_2024-12-04-11-24-05_17991936139808813176_out.log:63:[11:25:32][STATE] READY ---> RUNNING
 
 states=(
+  "Starting FairMQ state machine"
   "IDLE"
   "INITIALIZING_DEVICE"
   "INITIALIZED"
   "DEVICE_READY"
   "INITIALIZING_TASK"
-  "READY"
-  "RUNNING"
 )
 states_grep_strings=(
   "Starting FairMQ state machine \-\-> IDLE"
@@ -35,7 +34,6 @@ states_grep_strings=(
   "CONNECTING \-\-\-> DEVICE READY"
   "DEVICE READY \-\-\-> INITIALIZING TASK"
   "INITIALIZING TASK \-\-\-> READY"
-  "READY \-\-\-> RUNNING"
 )
 
 wDir=$(pwd)
@@ -65,7 +63,7 @@ for dir in $wDir/epn*; do
       delta=$((timestamp_to - timestamp_from))
 
       #output
-      printf "%-9s %-44s %-23s %-23s %-10s\n" $epn $task $state_from $state_to $delta >>${outFile}
+      printf "%-9s %-44s %-33s %-33s %-10s\n" $epn $task $state_from $state_to $delta >>${outFile}
     done
 
   done
