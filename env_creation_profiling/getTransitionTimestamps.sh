@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# this script should grep all EPN logs for the state transitions and calculate the transition times from the log timestamps.
+# this script should grep all EPN logs for the state transition timestamps.
 # the output is written to a textfile in the following format:
-# epn | task name | state (from) | state (to) | time for transition = timestamp(state) - timestamp(previous state)
+# epn | task name | state (from) | state (to) | timestamp
 
 # some development stuff
 # [09:11:20][STATE] Starting FairMQ state machine --> IDLE
