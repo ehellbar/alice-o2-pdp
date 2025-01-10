@@ -59,7 +59,7 @@ for i in $(seq 1 $((${#states[@]} - 2))); do
     epn=$(echo $dir | awk -F'/' '{print $NF}')
 
     # loop over *out.log files
-    for file in $(ls *_reco*_out.log); do
+    for file in $(ls *_out.log); do
       task=$(echo $file | awk -F'_2025' '{print $1}')
 
       # get timestamps in seconds

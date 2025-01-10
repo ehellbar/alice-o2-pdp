@@ -61,7 +61,7 @@ for dir in $wDir/epn*; do
   epn=$(echo $dir | awk -F'/' '{print $NF}')
 
   # loop over *out.log files
-  for file in $(ls *_reco*_out.log); do
+  for file in $(ls *_out.log); do
     task=$(echo $file | awk -F'_2025' '{print $1}')
 
     # loop over states
