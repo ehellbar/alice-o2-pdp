@@ -60,7 +60,7 @@ for i in $(seq 1 $((${#states[@]} - 2))); do
 
     # loop over *out.log files
     for file in $(ls *_reco*_out.log); do
-      task=$(echo $file | awk -F'_2024' '{print $1}')
+      task=$(echo $file | awk -F'_2025' '{print $1}')
 
       # get timestamps in seconds
       timestamp=$(date --date="$(grep "${states_grep_strings[$((i - 1))]}" $file | awk '{print $1}' | sed -e 's/\]\[STATE\]//g' -e 's/\[//g')" +%H:%M:%S)
