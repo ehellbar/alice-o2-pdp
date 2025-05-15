@@ -58,8 +58,8 @@ export DPL_REPORT_PROCESSING=1
 
 # sourced functions
 check_tfs_per_file() {
-  nFiles=10
-  nTFs=$(o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data $(cat rawtflist_LHC24ak_553146.txt | head -n ${nFiles} | sed -z 's/\n/,/g') -b --run | grep 'loops were sent' | awk -F' ' '{print $3}')
+  nFiles=${1:-10}
+  nTFs=$(o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data $(cat ${rawtfFileList} | head -n ${nFiles} | sed -z 's/\n/,/g') -b --run | grep 'loops were sent' | awk -F' ' '{print $3}')
   echo "${nTFs} TFs found in ${nFiles} files: $(echo $((nTFs * 10000 / nFiles)) | sed -e 's/....$/.&/;t' -e 's/.$/.0&/') TFs per file"
 }
 
