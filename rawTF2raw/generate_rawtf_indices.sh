@@ -30,9 +30,9 @@ print_help() {
   
   Example usage:
 
-  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 0 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_150tf 150
+  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 0 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_250tf 250
   sort_tfs
-  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 1 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_150tf
+  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 1 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_250tf
 
 EOF
 
