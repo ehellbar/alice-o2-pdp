@@ -27,6 +27,13 @@ print_help() {
     - param5: counter index of first TF to process 
     - param6: number of Blocks to be expected per TF to select data for all included detectors
           - if number of inputs is irrelevant, it can be set to 0 to be ignored
+  
+  Example usage:
+
+  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 0 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_150tf 150
+  sort_tfs
+
+
 EOF
 
   return
@@ -37,9 +44,9 @@ EOF
 runMode=$1
 rawtfFileList=$2
 outputDir=$3
-nTFs=$4
-firstTF=$5
-nBlocks=$6
+nTFs=${4:-100}
+firstTF=${5:-3500}
+nBlocks=${6:-0}
 
 # runMode=0
 # rawtfFileList=rawtflist_LHC24ak_553146.txt
