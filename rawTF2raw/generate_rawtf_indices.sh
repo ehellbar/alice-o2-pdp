@@ -32,7 +32,7 @@ print_help() {
 
   source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 0 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_150tf 150
   sort_tfs
-
+  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 1 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_150tf
 
 EOF
 
@@ -72,7 +72,7 @@ check_tfs_per_file() {
 
 sort_tfs() {
   if [ "0$nBlocks" -eq "00" ]; then
-    time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep 'tf-reader.*Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
+    time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep 'tf-reader.*Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ':' -k 3 -h >${tfs_sorted}
   else
     time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep "Block:${nBlocks}" -A 6 | grep 'tf-reader.*Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
   fi
