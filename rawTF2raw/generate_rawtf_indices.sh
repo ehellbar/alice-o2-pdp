@@ -30,9 +30,9 @@ print_help() {
   
   Example usage:
 
-  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 0 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_250tf 250
+  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 0 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750khz-replay-LHC25ab-563041-250tf 250 3500 14
   sort_tfs
-  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 1 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750kHz-replay-LHC25ab_563041_250tf
+  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 1 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750khz-replay-LHC25ab-563041-250tf
 
 EOF
 
@@ -56,6 +56,7 @@ nBlocks=${6:-0}
 # nBlocks=15
 
 # output file names
+tfreader_log=tf-reader_$(echo ${rawtfFileList} | sed 's/.txt//g' | awk -F 'rawtflist_' '{print $2}').log
 tfs_sorted=tfids_$(echo ${rawtfFileList} | sed 's/.txt//g' | awk -F 'rawtflist_' '{print $2}')_sorted.txt
 timeslices_sorted=timeslices_$(echo ${rawtfFileList} | sed 's/.txt//g' | awk -F 'rawtflist_' '{print $2}')_sorted.txt
 
@@ -71,12 +72,18 @@ check_tfs_per_file() {
 }
 
 sort_tfs() {
+  [[ ! -f ${tfreader_log} ]] && time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run > ${tfreader_log}
   if [ "0$nBlocks" -eq "00" ]; then
-    time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep 'tf-reader.*Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ':' -k 3 -h >${tfs_sorted}
+    grep 'tf-reader.*Done processing' ${tfreader_log} | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ':' -k 3 -h >${tfs_sorted}
   else
-    time o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} -b --run | grep "Block:${nBlocks}" -A 6 | grep 'tf-reader.*Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ' ' -k 2 >${tfs_sorted}
+    grep 'tf-reader' ${tfreader_log} | grep -v -e 'Executing sh' -e 'Resuming reading' -e 'Processing file' | grep "Block:${nBlocks}" -A 6 | grep 'Done processing' | sed 's/,//g' | awk '{print $5,$6,$7,$9}' | sort -t ':' -k 3 -h >${tfs_sorted}
   fi
-  firstLine=$(grep -nr tfCounter:${firstTF} ${tfs_sorted} | awk -F ':' '{print $1}')
+  firstTFtmp=${firstTF}
+  while true; do
+    firstLine=$(grep -nr tfCounter:${firstTFtmp} ${tfs_sorted} | awk -F ':' '{print $1}')
+    [[ ! -z ${firstLine} ]] && break
+    firstTFtmp=$((firstTFtmp+1))
+  done
   tail -n +${firstLine} ${tfs_sorted} | head -n ${nTFs} | awk '{print $1}' | sort -V | sed -z -e 's/timeslice://g ;  s/\n/,/g ; s/,$//g' >${timeslices_sorted}
 }
 
