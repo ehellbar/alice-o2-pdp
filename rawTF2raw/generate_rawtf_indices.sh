@@ -30,9 +30,9 @@ print_help() {
   
   Example usage:
 
-  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 0 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750khz-replay-LHC25ab-563041-250tf 250 3500 14
+  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 0 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750khz-replay-LHC25ab-563041 125 3500 14
   sort_tfs
-  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 1 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750khz-replay-LHC25ab-563041-250tf
+  source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh 1 rawtflist_LHC25ab_563041.txt 2025-05-19-pp-750khz-replay-LHC25ab-563041 125
 
 EOF
 
@@ -44,9 +44,12 @@ EOF
 runMode=$1
 rawtfFileList=$2
 outputDir=$3
-nTFs=${4:-100}
+nTFs=$4
 firstTF=${5:-3500}
 nBlocks=${6:-0}
+
+# add # TFs to output directory name
+outputDir=$(echo $outputDir | sed "s/$/-${nTFs}tf/g")
 
 # runMode=0
 # rawtfFileList=rawtflist_LHC24ak_553146.txt
@@ -90,7 +93,7 @@ sort_tfs() {
 # creation of raw data
 if [ "0${runMode}" -eq "01" ]; then
   mkdir -p ${outputDir}
-  echo "LID=$(cat ${timeslices_sorted})" | tee ${outputDir}.log
+  echo "LID=\"$(cat ${timeslices_sorted})\"" | tee ${outputDir}.log
   LID=$(cat ${timeslices_sorted})
   echo "o2-raw-tf-reader-workflow --raw-only-det all  --shm-segment-size 16000000000  --input-data ${rawtfFileList} --select-tf-ids " '$LID' " | o2-raw-data-dump-workflow --tof-input-uncompressed  --shm-segment-size 16000000000 --fatal-on-deadbeef --output-directory  ${outputDir} --dump-verbosity 1 --run | tee -a ${outputDir}.log" | tee -a ${outputDir}.log
   o2-raw-tf-reader-workflow --raw-only-det all --shm-segment-size 16000000000 --input-data ${rawtfFileList} --select-tf-ids "$LID" | o2-raw-data-dump-workflow --tof-input-uncompressed --shm-segment-size 16000000000 --fatal-on-deadbeef --output-directory ${outputDir} --dump-verbosity 1 --run | tee -a ${outputDir}.log
