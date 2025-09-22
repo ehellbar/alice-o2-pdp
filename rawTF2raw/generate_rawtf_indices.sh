@@ -1,5 +1,11 @@
 #!/bin/bash
 
+######################################
+#
+# !! moved to O2DPG/UTILS/rawTF2raw/generate_rawtf_indices.sh !!
+#
+#####################################
+
 # todo: replace all local variables with global ones form input args
 # source $ALICEO2PDP/rawTF2raw/generate_rawtf_indices.sh
 
